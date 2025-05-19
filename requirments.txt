@@ -4,3 +4,4 @@ requests
 postgres
 pg8000
 python-dotenv
+aiohttp

@@ -1,19 +1,7 @@
 from fastapi import FastAPI
 from db.db_connection import connection
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
-# Allow all origins for testing (you may restrict in production)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
-)
-
-
 
 @app.get("/get_games")
 def get_healthcheck():

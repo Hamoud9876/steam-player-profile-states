@@ -1,7 +1,12 @@
 import  requests
 import time
 import os
+from db.db_connection import connection
 from dotenv import load_dotenv
+from db.insert_into_tables import *
+from db.db_connection import connection
+import asyncio
+import aiohttp
 
 load_dotenv()
 
@@ -22,7 +27,7 @@ def pull_steam_data():
                 raise Exception
             else:
                 break
-         
+        
     except Exception:
         return "no information found"
     except TooManyCalles:
@@ -30,6 +35,52 @@ def pull_steam_data():
     
     
     return {"player_id": player_id, "steam_data": steam_response.json()}
+    
 
+
+
+
+async def get_game_genres_categories_price():
+
+    conn = connection()
+    query = """SELECT appid FROM games where appid != 0 ORDER BY appid"""
+    db_response = conn.run(query)          
+    appids = [row[0] for row in db_response]
+    await process_http_requests(appids)
+    conn.close()
+
+
+#made as its own function for reuability 
+async def process_http_requests(appids):
+   async with aiohttp.ClientSession() as session:
+        tasks= [fetch_game_data(session,appid) for appid in appids]
+        result = await asyncio.gather(*tasks)
+        insert_into_category_table_bulk(result)
+        insert_into_genres_table_bulk(result)
+        insert_into_prices_table_bulk(result)
+
+semaphore = asyncio.Semaphore(3)
+async def fetch_game_data(session, appid):
+    async with semaphore:
+        url = f'https://store.steampowered.com/api/appdetails?appids={appid}'
+    try:    
+        async with session.get(url) as response:
+            if response.status == 200:
+                return appid, await response.json()
+    except Exception as e:
+        print(appid, e)
+        conn = connection()
+        query = "INSERT INTO failed_keys(appid) VALUES (:appid)" 
+        conn.run(query, appid=appid)   
+    
+        
 class TooManyCalles(Exception):
     "too many calls"
+
+class NoInformationFound(Exception):
+    def __init__(self, appid, message="the ID return no information"):
+        self.appid = appid
+        self.message = f"{message}: (appid: {appid})"
+        super().__init__(self.message)
+
+    
