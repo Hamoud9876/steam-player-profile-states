@@ -1,4 +1,4 @@
 .env
 venv
-MakeFile
+# MakeFile
 */__pycache__/*

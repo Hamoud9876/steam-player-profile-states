@@ -1,0 +1,7 @@
+pytest
+requests
+"fastapi[standard]"
+postgres
+pg8000
+python-dotenv
+aiohttp

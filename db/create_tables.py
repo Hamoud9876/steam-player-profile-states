@@ -1,10 +1,6 @@
 from db.db_connection import connection
 
 
-
-
-
-
 def create_games_table():
     conn = connection()
     conn.run("DROP TABLE IF EXISTS games")
@@ -46,6 +42,7 @@ def create_category_table():
     conn.run(query)
     conn.close()
 
+
 def create_prices_table():
     conn = connection()
     conn.run("DROP TABLE IF EXISTS prices")
@@ -60,6 +57,7 @@ def create_prices_table():
 
     conn.run(query)
     conn.close()
+
 
 def create_table_failed_keys():
     conn = connection()
