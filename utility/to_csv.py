@@ -4,7 +4,7 @@ from db.db_connection import connection
 
 def all_player_data_sql_to_csv():
     data = get_player_data_from_tables()
-    with open("steam_data.csv", "w") as csv_steam_file:
+    with open("steam_user_data.csv", "w") as csv_steam_file:
         my_writer = csv.writer(csv_steam_file)
         my_writer.writerow(
             [
