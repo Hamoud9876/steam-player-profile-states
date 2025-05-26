@@ -1,14 +1,8 @@
 from src.steam_personal_states import *
-
-# from fastapi import testclient
+from unittest.mock import patch
 import pytest
 import aiohttp
 import asyncio
-
-
-# @pytest.mark.fixture
-# def client():
-#     return testclient()
 
 
 class TestSteamAPI:
@@ -24,7 +18,7 @@ class TestSteamAPI:
 @pytest.mark.asyncio
 class TestAPIsAscynroFunctions:
     @pytest.mark.skip
-    async def test_fetching_data(self):
+    async def test_fetching_data_makes_successful_api_call(self):
         appids = [10, 20, 30, 40]
         async with aiohttp.ClientSession() as session:
             tasks = [fetch_game_data(session, appid) for appid in appids]

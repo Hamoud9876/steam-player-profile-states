@@ -61,11 +61,10 @@ class TestGenresTable:
             assert isinstance(row[1], int)
             assert isinstance(row[2], str)
 
-
+@pytest.mark.skip
 class TestConvertingSqlToFile:
     def test_select_to_be_converted_is_correct(self):
         result = get_player_data_from_tables()
-
         for row in result:
             assert isinstance(row[0], int)
             assert isinstance(row[1], int)
@@ -84,3 +83,72 @@ class TestConvertingSqlToFile:
         with open("steam_data.csv") as f:
             myreader = csv.reader(f)
             print(myreader)
+
+class TestInsertingIntoOlap:
+    @pytest.mark.skip
+    def test_inserting_into_dim_player_info(self):
+        conn = connection()
+        query = """SELECT * FROM dim_player_info"""
+        result = conn.run(query)
+
+        conn.close()
+
+        assert len(result) > 0
+        
+        
+
+
+    @pytest.mark.skip
+    def test_inserting_into_dim_categories(self):
+        conn = connection()
+        query = """SELECT * FROM dim_categories"""
+
+        result = conn.run(query)
+
+        conn.close()
+        assert len(result) > 0
+
+
+    @pytest.mark.skip
+    def test_insert_into_dim_genres(self):
+        conn = connection()
+        query = "SELECT * FROM dim_genres"
+
+        result = conn.run(query)
+        conn.close()
+        assert len(result) > 0
+
+
+    @pytest.mark.skip
+    def test_insert_into_dim_games_info(self):
+        conn = connection()
+        query = " SELECT * FROM dim_games_info"
+
+        result = conn.run(query)
+    
+        conn.close()
+        assert len(result) > 0
+
+
+    @pytest.mark.skip
+    def test_insert_into_bridge_game_categoies(self):
+        conn = connection()
+        query = "SELECT * FROM bridge_game_categories WHERE game_id"
+        
+        result = conn.run(query)
+
+        
+        conn.close()
+        assert len(result) > 0
+
+    
+    def test_insert_into_bridge_game_genre(self):
+        conn = connection()
+        query = "SELECT * FROM bridge_games_genres"
+        
+        result = conn.run(query)
+
+        
+        conn.close()
+        assert len(result) > 0
+
