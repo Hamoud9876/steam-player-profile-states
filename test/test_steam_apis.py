@@ -1,13 +1,74 @@
 from src.steam_personal_states import *
-from unittest.mock import patch
+from utility.transform_player_data import transform_player_data
+from unittest.mock import patch,Mock
 import pytest
-import aiohttp
-import asyncio
+import json
 
 
-class TestSteamAPI:
+class TestSteamAPIGetGames:
     @pytest.mark.skip
-    def test_getting_data(self):
+    @patch('requests.get')
+    def test_getting_games_data(self, patch_mock):
+        mock_response = Mock()
+        mock_response.json.return_value = {
+                "response":{
+                    "games": [
+                                {
+                        "appid": 386360,
+                        "name": "SMITE",
+                        "playtime_forever": 0,
+                        "img_icon_url": "7ed9de7bbfab9accb81e47b84943e7478baf2f3a",
+                        "has_community_visible_stats": True,
+                        "playtime_windows_forever": 0,
+                        "playtime_mac_forever": 0,
+                        "playtime_linux_forever": 0,
+                        "playtime_deck_forever": 0,
+                        "rtime_last_played": 0,
+                        "playtime_disconnected": 0
+                    },
+                    {
+                        "appid": 858460,
+                        "name": "SMITE - Public Test",
+                        "playtime_forever": 0,
+                        "img_icon_url": "20e160ebdeddbb45f1066f62797cee2dff94da95",
+                        "playtime_windows_forever": 0,
+                        "playtime_mac_forever": 0,
+                        "playtime_linux_forever": 0,
+                        "playtime_deck_forever": 0,
+                        "rtime_last_played": 0,
+                        "playtime_disconnected": 0
+                    },
+                    {
+                        "appid": 961200,
+                        "name": "Predecessor",
+                        "playtime_forever": 104,
+                        "img_icon_url": "df1af75146dcf9bb96b10f29ad4c0ee7416df9ab",
+                        "playtime_windows_forever": 104,
+                        "playtime_mac_forever": 0,
+                        "playtime_linux_forever": 0,
+                        "playtime_deck_forever": 0,
+                        "rtime_last_played": 1703674343,
+                        "playtime_disconnected": 0
+                    },
+                    {
+                        "appid": 1284210,
+                        "name": "Haaa i",
+                        "playtime_forever": 18,
+                        "img_icon_url": "da75f97c0eb3abcd82fcbd0eee8725f0215b42ac",
+                        "playtime_windows_forever": 18,
+                        "playtime_mac_forever": 0,
+                        "playtime_linux_forever": 0,
+                        "playtime_deck_forever": 0,
+                        "rtime_last_played": 1666983335,
+                        "playtime_disconnected": 0
+                    }
+                    ]
+                }
+            }
+        
+        patch_mock.return_value = mock_response
+        
+        
         api_response = pull_steam_data()
         for row in api_response["steam_data"]["response"]["games"]:
             assert isinstance(row["appid"], int)
@@ -15,55 +76,93 @@ class TestSteamAPI:
             assert isinstance(row["playtime_forever"], int)
 
 
-@pytest.mark.asyncio
-class TestAPIsAscynroFunctions:
     @pytest.mark.skip
-    async def test_fetching_data_makes_successful_api_call(self):
-        appids = [10, 20, 30, 40]
-        async with aiohttp.ClientSession() as session:
-            tasks = [fetch_game_data(session, appid) for appid in appids]
-            result = await asyncio.gather(*tasks)
+    @patch('requests.get')
+    def test_failes_too_many_calles_status_code_429(self,patch_mock):
+        mock_response = Mock()
+        mock_response.status_code = 429
+        
+        patch_mock.return_value = mock_response
+        
+        
+        api_response = pull_steam_data()
+        assert api_response == "calls to the api had failed, try again later"
 
-        assert isinstance(result, list)
-        assert isinstance(result[0], tuple)
-        for appid, desc in result:
-            assert desc.get(str(appid), {}).get("success")
-
+    
     @pytest.mark.skip
-    async def test_process_all_data_categories(self):
-        appids = [10, 20, 30, 40]
-        await process_http_requests(appids)
+    @patch('requests.get')
+    def test_failes_status_code_404(self,patch_mock):
+        mock_response = Mock()
+        mock_response.status_code= 404
+        
+        patch_mock.return_value = mock_response
+        
+        
+        api_response = pull_steam_data()
+        assert api_response == "no information found"
 
-        conn = connection()
-        query = """SELECT * FROM categories;"""
-        db_respone = conn.run(query)
-        for row in db_respone:
-            assert isinstance(row[0], int)
-            assert isinstance(row[1], int)
-            assert isinstance(row[2], str)
 
-    @pytest.mark.skip
-    async def test_process_all_data_genres(self):
-        appids = [10, 20, 30, 40]
-        await process_http_requests(appids)
 
-        conn = connection()
-        query = """SELECT * FROM genres;"""
-        db_respone = conn.run(query)
-        for row in db_respone:
-            assert isinstance(row[0], int)
-            assert isinstance(row[1], int)
-            assert isinstance(row[2], str)
+class TestGetGamesDetails:
+    def test_returns_game_details(self):
+        games_df = transform_player_data({"player_id": 12, "steam_data": json.dumps({
+                    "response":{
+                        "games": [
+                                    {
+                            "appid": 386360,
+                            "name": "SMITE",
+                            "playtime_forever": 0,
+                            "img_icon_url": "7ed9de7bbfab9accb81e47b84943e7478baf2f3a",
+                            "has_community_visible_stats": True,
+                            "playtime_windows_forever": 0,
+                            "playtime_mac_forever": 0,
+                            "playtime_linux_forever": 0,
+                            "playtime_deck_forever": 0,
+                            "rtime_last_played": 0,
+                            "playtime_disconnected": 0
+                        },
+                        {
+                            "appid": 858460,
+                            "name": "SMITE - Public Test",
+                            "playtime_forever": 0,
+                            "img_icon_url": "20e160ebdeddbb45f1066f62797cee2dff94da95",
+                            "playtime_windows_forever": 0,
+                            "playtime_mac_forever": 0,
+                            "playtime_linux_forever": 0,
+                            "playtime_deck_forever": 0,
+                            "rtime_last_played": 0,
+                            "playtime_disconnected": 0
+                        },
+                        {
+                            "appid": 961200,
+                            "name": "Predecessor",
+                            "playtime_forever": 104,
+                            "img_icon_url": "df1af75146dcf9bb96b10f29ad4c0ee7416df9ab",
+                            "playtime_windows_forever": 104,
+                            "playtime_mac_forever": 0,
+                            "playtime_linux_forever": 0,
+                            "playtime_deck_forever": 0,
+                            "rtime_last_played": 1703674343,
+                            "playtime_disconnected": 0
+                        },
+                        {
+                            "appid": 1284210,
+                            "name": "Haaa i",
+                            "playtime_forever": 18,
+                            "img_icon_url": "da75f97c0eb3abcd82fcbd0eee8725f0215b42ac",
+                            "playtime_windows_forever": 18,
+                            "playtime_mac_forever": 0,
+                            "playtime_linux_forever": 0,
+                            "playtime_deck_forever": 0,
+                            "rtime_last_played": 1666983335,
+                            "playtime_disconnected": 0
+                        }
+                        ]
+                    }
+                })
+                })
+        
+        response = get_game_details(games_df)
 
-    @pytest.mark.skip
-    async def test_process_all_data_price(self):
-        appids = [10, 20, 30, 40]
-        await process_http_requests(appids)
-
-        conn = connection()
-        query = """SELECT * FROM prices;"""
-        db_respone = conn.run(query)
-        for row in db_respone:
-            assert isinstance(row[0], int)
-            assert isinstance(row[1], int)
-            assert isinstance(row[2], str)
+        print(response)
+    
