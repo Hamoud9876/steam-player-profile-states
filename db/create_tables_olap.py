@@ -1,7 +1,6 @@
 from db.db_connection import connection
 
 
-
 def create_olap_db():
     conn = connection()
 
@@ -14,10 +13,13 @@ def create_olap_db():
 
     query_dim_expenditures = """CREATE TABLE dim_expenditures(
         expenditure_id SERIAL PRIMARY KEY,
-        curreny varchar(10),
+        currency varchar(10),
         initial_price int,
         final_price int,
-        discount_percent int
+        discount_percent int,
+        initial_price_gbp float,
+        final_price_gbp float,
+        exchange_rate_date date
         )"""
     conn.run(query_dim_expenditures)
 
@@ -52,7 +54,6 @@ def create_olap_db():
         """
     conn.run(query_bridge_games_genres)
 
-
     query_fact = """CREATE TABLE fact_player_online_behaviour (
         profile_id SERIAL PRIMARY KEY,
         player_info_id int references dim_player_info(player_info_id),
@@ -62,5 +63,6 @@ def create_olap_db():
         )"""
     conn.run(query_fact)
 
-    conn.close()
 
+
+    conn.close()
