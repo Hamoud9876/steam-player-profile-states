@@ -15,5 +15,5 @@ def connection():
     )
 
 
-# def db_close(db):
-#     db.close()
+def db_close(db):
+    db.close()
