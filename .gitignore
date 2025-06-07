@@ -1,4 +1,5 @@
 .env
 venv
-# MakeFile
-*/__pycache__/*
+.coverage
+**/*pycache
+*__pycache__
