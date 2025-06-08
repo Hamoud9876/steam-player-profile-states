@@ -104,7 +104,8 @@ class TestSteamAPIGetGames:
 
 
 class TestGetGamesDetails:
-    def test_returns_game_details(self):
+    @patch('requests.get')
+    def test_returns_game_details(self,patch_mock):
         games_df = transform_player_data({"player_id": 12, "steam_data": json.dumps({
                     "response":{
                         "games": [
@@ -164,5 +165,5 @@ class TestGetGamesDetails:
         
         response = get_game_details(games_df)
 
-        print(response)
+        # print(response)
     
