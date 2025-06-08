@@ -1,6 +1,7 @@
-from db.db_connection import connection
 from dotenv import load_dotenv
 from utility.transform_player_data import transform_player_data
+from utility.transform_games_details import transform_games_details
+from utility.convert_currency import convert_currency_to_gbp
 import requests
 import time
 import os
@@ -40,9 +41,15 @@ def pull_steam_data():
 def get_game_details(game_data_df: pd.DataFrame):
     game_details_list = []
     for index, game in game_data_df.iterrows():
-        game_details_list.append(requests.get(f"https://store.steampowered.com/api/appdetails?appids={game["appid"]}"))
+        game_details_list.append({"game_id":game["appid"],"api_response": requests.get(f"https://store.steampowered.com/api/appdetails?appids={game["appid"]}")})
+
+    print(game_details_list)
         
-    
+    # games_details_dict_df = transform_games_details(game_details_list)
+
+    # for i in games_details_dict_df["games_price_info_df"]:
+    #     print(i)
+
 
 
 class TooManyCalles(Exception):
