@@ -1,10 +1,13 @@
 from utility.transform_player_data import transform_player_data
+from utility.transform_games_details import transform_games_details
+from data.data import game_details
 import json
 import pandas as pd
 
 
 
-class TestTransformPlayerData():
+
+class TestTransformPlayerData:
     def test_handles_empty_dict(self):
         response = transform_player_data({"player_id": 12, "steam_data":{}})
         assert response == -1
@@ -140,5 +143,41 @@ class TestTransformPlayerData():
             assert type(row["name"]) == str
             assert isinstance(row["playtime_forever"],int)
         
+
+class TestTransformGamesDetails:
+    def test_handles_empty_input(self):
+        respones = transform_games_details([])
+
+        assert respones == "Not a valid input for games details"
+
+
+    def test_returns_dict_dataframe(self):
+        respones = transform_games_details(game_details)
+
+        assert isinstance(respones["games_genres_df"], pd.DataFrame)
+        assert isinstance(respones["games_categories_df"], pd.DataFrame)
+        assert isinstance(respones["games_price_info_df"], pd.DataFrame)
+
+
+    def test_transforms_games_details(self):
+        respones = transform_games_details(game_details)
+
+        for index, i in respones["games_genres_df"].iterrows():
+            assert isinstance(index, str)
+            assert isinstance(i,pd.Series)
+
+        for index, i in respones["games_categories_df"].iterrows():
+            assert isinstance(index, str)
+            assert isinstance(i,pd.Series)
+
+        for index, i in respones["games_price_info_df"].iterrows():
+            assert isinstance(index, str)
+            assert isinstance(i,pd.Series)
+
+
+
+
+        
+
 
 
